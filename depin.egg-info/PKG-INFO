@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: depin
+Version: 0.0.1
+Summary: Python package to utilize olinda depin services
+Home-page: UNKNOWN
+Author: Himanshu, Frank, Maylon
+Author-email: <addyjeridiq@email.com>
+License: UNKNOWN
+Description: For more information visit here https://bit.ly/3FJPiqe
+Keywords: python,bcb,olinda
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Education
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
