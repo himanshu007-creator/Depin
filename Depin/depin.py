@@ -1,5 +1,3 @@
-
-
 import requests
 import json
 
@@ -13,19 +11,21 @@ def currency(orderby=None, filter=None, skip=None, top=None):
         skip   (str)[Optional]: Index (greater than or equal to zero) of the first entity that will be returned
         top    (str)[Optional]: Maximum number (greater than zero) of entities that will be returned
     Returns:
-        object: Show Symbol,CurrencyName,CurrencyType.
+        list: Show Symbol,CurrencyName,CurrencyType.
     """
+    l = []
     url = "https://olinda.bcb.gov.br/olinda/service/PTAX/version/v1/odata/Currencies?$top=100&$format=json"
 
     response = requests.get(url)
     fields = response.content.decode('utf8').replace("'", '"')
     data = json.loads(fields)
-
-    return {
-        "symbol": data['value'][0]['simbolo'],
-        "CurrencyName": data['value'][0]['nomeFormatado'],
-        "CurrencyType": data['value'][0]['tipoMoeda']
-    }
+    for i in data['value']:
+        l.append({
+            "Symbol": i['simbolo'],
+            "CurrencyName": i['nomeFormatado'],
+            "CurrencyType": i['tipoMoeda']
+        })
+    return l
 
 
 def exchange_date_rate(currency, date, orderby=None, filter=None, skip=None, top=None):
@@ -57,12 +57,12 @@ def exchange_date_rate(currency, date, orderby=None, filter=None, skip=None, top
     data = json.loads(dd)
     for i in data['value']:
         d = {
-            'bidparity': i['paridadeCompra'],
-            'offerparity': i['paridadeVenda'],
-            'bidrate': i['cotacaoCompra'],
-            'offerrate': i['cotacaoVenda'],
-            'datetime': i['dataHoraCotacao'],
-            'bulletintime': i['tipoBoletim'],
+            'BidParity': i['paridadeCompra'],
+            'OfferParity': i['paridadeVenda'],
+            'BidRate': i['cotacaoCompra'],
+            'OfferRate': i['cotacaoVenda'],
+            'DateTime': i['dataHoraCotacao'],
+            'BulletinTime': i['tipoBoletim'],
         }
         l.append(d)
     return l
@@ -79,7 +79,6 @@ def exchange_rate_period(currency, start_date, end_date, orderby=None, filter=No
         filter (str) [Optional] : Entities filter selection. e.g. Name eq ‘John’
         skip (int) [Optional]   : Index (greater than or equal to zero) of the first entity that will be returned
         top (int )[Optional]    : Maximum number (greater than zero) of entities that will be returned
-
     Returns:
         bool: The return value. True for success, False otherwise.
     """
@@ -123,12 +122,11 @@ def dollar_rate_date(date, orderby=None, filter=None, skip=None, top=None):
         filter (str) [Optional] : Entities filter selection. e.g. Name eq ‘John’
         skip (int) [Optional]   : Index (greater than or equal to zero) of the first entity that will be returned
         top (int) [Optional]    : Maximum number (greater than zero) of entities that will be returned
-
     Returns:
         object: bid and offer rates for the requested date.
     """
     url = "https://olinda.bcb.gov.br/olinda/service/PTAX/version/v1/odata/DollarRateDate(dataCotacao=@dataCotacao)?%40dataCotacao='{}'&%24format=json".format(
-        date)
+        str(date))
     if(orderby):
         url += "&%24orderby="+orderby
     if(filter):
@@ -142,9 +140,9 @@ def dollar_rate_date(date, orderby=None, filter=None, skip=None, top=None):
     data = json.loads(dd)
     # return data['value']
     return {
-        "Bidrate": data['value'][0]['cotacaoCompra'],
-        "Offerrate": data['value'][0]['cotacaoVenda'],
-        "Datetime": data['value'][0]['dataHoraCotacao']
+        "BidRate": data['value'][0]['cotacaoCompra'],
+        "OfferRate": data['value'][0]['cotacaoVenda'],
+        "DateTime": data['value'][0]['dataHoraCotacao']
     }
 
 
@@ -152,19 +150,17 @@ def dollar_rate_period(start_date, end_date, orderby=None, filter=None, skip=Non
     """
     Provides bid and offer rates for the requested time period.
      Args:
-        currency (str): 3 letter symbol e.g 'USD'
         start_date (str): format 'MM-DD-YYYY'
         end_date (str): format 'MM-DD-YYYY'
         orderby (str) [Optional] : Entity properties order selection. e.g. Name asc, Age desc
         filter (str) [Optional] : Entities filter selection. e.g. Name eq ‘John’
         skip (int) [Optional] : Index (greater than or equal to zero) of the first entity that will be returned
         top (int) [Optional] : Maximum number (greater than zero) of entities that will be returned
-
     Returns:
         object: Provides bid and offer rates for the requested date
     """
 
-    url = "https://olinda.bcb.gov.br/olinda/service/PTAX/version/v1/odata/DollarRatePeriod(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?@dataInicial=''&@dataFinalCotacao=''&$top=100&$format=json".format(
+    url = "https://olinda.bcb.gov.br/olinda/service/PTAX/version/v1/odata/DollarRatePeriod(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?@dataInicial='{}'&@dataFinalCotacao='{}'&$top=100&$format=json".format(
         start_date, end_date)
 
     if (orderby):
